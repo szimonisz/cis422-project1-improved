@@ -27,11 +27,11 @@ def map():
 # GET: retrieving information 
 # example: going to the post office to ask for your letter
 
-# handle POST requests that are sent to the URL /algo
+# handle POST requests that are sent to the URL /api/optimal_route
 # Receive an origins-destinations matrix, algorithm type, and number of destinations
 # Run the requested TSP algorithm, calculate the optimal route
 # Send a JSON response containing the optimal route 
-@map_blueprint.route('/algo', methods=['POST'])
+@map_blueprint.route('/api/optimal_route', methods=['POST'])
 def runAlgorithm():
     # POST request
     # parse the POST request as JSON

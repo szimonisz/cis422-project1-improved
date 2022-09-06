@@ -1,14 +1,25 @@
+/*****************************************************************************************************************************************************************************
+File Name: map.js
+ 
+Author: Kelemen Szimonisz
+Organization: Map Culture (University of Oregon, CIS422, FALL 2021)
+
+This JavaScript file contains the MapRenderer class.
+The MapRenderer class properties include the directionsService, directionsRenderer, map, and markers.
+The MapRenderer class methods handle the drawing of the map, markers, and route.
+
+Creation Date: 09/05/2022
+Last Modified: 09/06/2022
+****************************************************************************************************************************************************************************/
 import {getMatrix, getOptimalRoute} from './matrix.js';
 import {getPlace} from './places.js';
 import {displayMessage} from './helpers.js';
-export {Director}
+export {MapRenderer}
 
-class Director {
+class MapRenderer {
     constructor(zoom) {
         this.zoom = zoom;
-        // Assign the Distance Matrix and Directions service to their respective global variables
         this.directionsService = new google.maps.DirectionsService();
-        // Assign the DirectionsRenderer to its respective global variable, set properties for the DirectionsRenderer object
         this.directionsRenderer = new google.maps.DirectionsRenderer({
             // stop the DirectionsRenderer from producing its own markers
             suppressMarkers: true
@@ -19,7 +30,7 @@ class Director {
             // set zoom level
             // Google Maps API approximate level of detail per zoom level:
             // 1: World, 5: Landmass/continent, 10: City, 15: Streets, 20: Buildings
-            zoom: 12,
+            zoom: this.zoom,
         });
 
         // Specify that directions should be rendered on the map object
@@ -50,25 +61,24 @@ class Director {
     /****************************************************************************************************************************************************************************
     METHOD: setMapOnAll
     
-    This function draws all markers from the markers list onto the map.
+    This method draws all markers from the markers list onto the map.
     
     This code was taken from a Google Maps API Documentation Example
     Source: https://developers.google.com/maps/documentation/javascript/examples/marker-remove
     ****************************************************************************************************************************************************************************/
     setMapOnAll(map) {
         // add every marker from the global markers list to the map
-        console.log(this.markers);
         for (let i = 0; i < this.markers.length; i++) {
             this.markers[i].setMap(map);
         }
     }
     /****************************************************************************************************************************************************************************
-    FUNCTION: drawRoute
+    METHOD: drawRoute
     
-    This function uses the Google Directions Service's route method to obtain a street-by-street path from a list of destinations.
+    This method uses the Google Directions Service's route method to obtain a street-by-street path from a list of destinations.
     The DirectionsRenderer object is used to draw the route on the map.
     
-    The function takes a list of destinations as input, where the first and last destinations are origins. The route will be formed by order of the list.
+    The method takes a list of destinations as input, where the first and last destinations are origins. The route will be formed by order of the list.
     ****************************************************************************************************************************************************************************/
     drawRoute(dests) {
         // the origin is the first location in the dests list
@@ -111,12 +121,11 @@ class Director {
         });
     }
     /****************************************************************************************************************************************************************************
-    FUNCTION: clearMap
+    METHOD: clearMap
     
-    This function clears any existing routes and markers from the global map object.
+    This method clears any existing routes and markers from the global map object.
     ****************************************************************************************************************************************************************************/
     clearMap() {
-        console.log("clear");
         // dissassociate the directionsRenderer (route drawer) from the map
         this.directionsRenderer.setMap(null);
         // remove all markers from the map
@@ -125,10 +134,10 @@ class Director {
         this.markers = [];
     }
     /****************************************************************************************************************************************************************************
-    FUNCTION: drawMap
+    METHOD: drawMap
 
-    This is the main function that draws an interactive map with an optimal route between an origin and a set of destinations (optimizing for either distance or duration)
-    This function takes in a list of user inputted location strings, where the first and last locations are the same. (Round trip).
+    This is the main method that draws an interactive map with an optimal route between an origin and a set of destinations (optimizing for either distance or duration)
+    This method takes in a list of user inputted location strings, where the first and last locations are the same. (Round trip).
     It initializes the Google Maps Javascript API map, then calls the helper function getPlace to convert the user inputted destinations into coordinates.
     A marker is created at each set of coordinates (except for the final location, to not overlap with the starting location's marker -- as they are the same).
     The distance and duration matrices are obtained by calling getMatrix, a call is then made to getOptimalRoute with that function as input.

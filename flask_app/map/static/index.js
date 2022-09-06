@@ -1,14 +1,10 @@
-import {Director} from './modules/map.js';
-import {autoCompletify, getPlace} from './modules/places.js';
-import {displayMessage, sleep, hideElementForSeconds} from './modules/helpers.js';
-export {placesService, distanceMatrixService};
 /*****************************************************************************************************************************************************************************
 File Name: index.js
  
 Author: Kelemen Szimonisz
 Organization: Map Culture (University of Oregon, CIS422, FALL 2021)
 
-This Javascript file is used by the map.html template and enables the page to:
+This Javascript file (and its imported modules) is used by the map.html template and enables the page to:
     1. Append the number of inputs to the destination entry form when the 'Add destination' button is clicked.
     2. Handle the submit button for the destination entry form
     3. Use the Google Maps Javascript API to:
@@ -20,29 +16,39 @@ This Javascript file is used by the map.html template and enables the page to:
         - Draw this optimal route onto the map 
 
 Creation Date: 10/03/2021
-Last Modified: 11/02/2021
+Last Modified: 09/06/2022
 
-*****************************************************************************************************************************************************************************\
-/* imports */
-/* Declare global index.js variables: */
-let director;                   /* The Google Maps Javascript API map instance */
+*****************************************************************************************************************************************************************************/
+
+import { MapRenderer } from './modules/map.js';
+import { autoCompletify, getPlace } from './modules/places.js';
+import { displayMessage, sleep, hideElementForSeconds } from './modules/helpers.js';
+export { placesService, distanceMatrixService };
+
+/* Declare global variables: */
+let mapRenderer;           /* Instance of MapRenderer class. Properties include:
+                                - Google Maps Javascript API map instance 
+                                - Zoom (view distance)
+                                - DirectionsService
+                                - DirectionsRenderer 
+                                - Markers */
 let distanceMatrixService; /* Communicates with the Google Maps Javascript API Distance Matrix Service. Computes travel distance for a set of destinations. */
 let placesService;         /* This object communicates with the Google Maps Javascript API Places Library. Enables the app to obtain a coordinate given an address or place name */
 
 /*****************************************************************************************************************************************************************************
 FUNCTION: initMap
 
-This function instantiates and initializes the interactive map that is provided by the Google Maps Javascript API.
+This function instantiates and initializes the interactive map that is provided by the Google Maps Javascript API (via the custom MapRenderer class).
 All services or libraries used by the Google Maps Javascript API map are initalized here as well (Places, DistanceMatrix, Directions).
 
 ****************************************************************************************************************************************************************************/
 function initMap() {
-    director = new Director(12);
-    // Instantiate a Places Service and assign it to the respective global variable. Provide the map as input (so attributions can be rendered).
-    placesService = new google.maps.places.PlacesService(director.map);
+    mapRenderer = new MapRenderer(12);
+    // Instantiate a Google Places Service and assign it to the respective global variable. Provide the map as input (so attributions can be rendered).
+    placesService = new google.maps.places.PlacesService(mapRenderer.map);
+    // Instantiate a Google DistanceMatrix Service and assign it to the respective global variable
     distanceMatrixService = new google.maps.DistanceMatrixService();
 }
-initMap();
 
 /****************************************************************************************************************************************************************************
 EVENT LISTENERS
@@ -52,6 +58,7 @@ These are event listeners that attach to a specific element in the HTML template
 ****************************************************************************************************************************************************************************/
 // Wait for the DOM to finish loading before manipulating it
 document.addEventListener("DOMContentLoaded", function () {
+    initMap();
     // the origin address text input HTML element
     var originEntry = document.getElementById('origin');
 
@@ -122,8 +129,8 @@ document.addEventListener("DOMContentLoaded", function () {
             // display an error message and kill execution
             displayMessage("ERROR: A route requires an origin and at least one destination. Please try again.", true);
             // if the map is defined when this error occurs, then clear the map of any routes and markers
-            if (director.map !== undefined) {
-                director.clearMap();
+            if (mapRenderer.map !== undefined) {
+                mapRenderer.clearMap();
             }
             return;
         }
@@ -138,19 +145,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // "Draw a route that minimizes distance and uses the MST algorithm"
         if (radioDistance.checked && radioMST.checked) {
-            director.drawMap(destinations, 'distance', 'MST');
+            mapRenderer.drawMap(destinations, 'distance', 'MST');
         }
         // "Draw a route that minimizes time and uses the MST algorithm"
         else if (radioDuration.checked && radioMST.checked) {
-            director.drawMap(destinations, 'duration', 'MST');
+            mapRenderer.drawMap(destinations, 'duration', 'MST');
         }
         // "Draw a route that minimizes distance and uses the genetic algorithm"
         else if (radioDistance.checked && radioGenetic.checked) {
-            director.drawMap(destinations, 'distance', 'genetic');
+            mapRenderer.drawMap(destinations, 'distance', 'genetic');
         }
         // "Draw a route that minimizes time and uses the genetic algorithm"
         else if (radioDuration.checked && radioGenetic.checked) {
-            director.drawMap(destinations, 'duration', 'genetic');
+            mapRenderer.drawMap(destinations, 'duration', 'genetic');
         }
     });
 

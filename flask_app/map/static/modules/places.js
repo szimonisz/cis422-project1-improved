@@ -1,3 +1,17 @@
+/*****************************************************************************************************************************************************************************
+File Name: places.js
+ 
+Author: Kelemen Szimonisz
+Organization: Map Culture (University of Oregon, CIS422, FALL 2021)
+
+This JavaScript file contains two functions:
+    - autoCompletify (converts a input HTML element to a Google Places Autocomplete input)
+    - getPlace (converts an address into a coordinate using the Google Places API)
+
+Creation Date: 09/05/2022
+Last Modified: 09/06/2022
+****************************************************************************************************************************************************************************/
+
 import {placesService} from '../index.js';
 export {autoCompletify, getPlace}
 /****************************************************************************************************************************************************************************

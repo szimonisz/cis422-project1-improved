@@ -1,3 +1,21 @@
+/*****************************************************************************************************************************************************************************
+File Name: matrix.js
+ 
+Author: Kelemen Szimonisz
+Organization: Map Culture (University of Oregon, CIS422, FALL 2021)
+
+This JavaScript file contains functions that call onto two different API endpoints: 
+    - Google DistanceMatrix API
+        - Input: a list of destination coordinates (including the origin)
+        - Output: A response status, distance matrix, and duration matrix
+    - /api/optimal_route
+        - Input: an algorithm type ('MST' or 'genetic'), a matrix, and a list of destinations (including the origin)
+        - Output: A JSON that contains the optimal order in which to travel from the origin, to each destination, and then back to the origin
+
+Creation Date: 09/05/2022
+Last Modified: 09/06/2022
+****************************************************************************************************************************************************************************/
+
 import {distanceMatrixService} from '../index.js';
 export {getMatrix, getOptimalRoute}
 
@@ -89,7 +107,7 @@ async function getMatrix(dests) {
 /****************************************************************************************************************************************************************************
 Function getOptimalRoute
 
-This function sends a POST HTTP request to the '/optimalroute' URL of the Flask server and receives a response containing the optimal route produced by a TSP algorithm
+This function sends a POST HTTP request to the '/api/optimal_route' URL of the Flask server and receives a response containing the optimal route produced by a TSP algorithm
 The request consists of the number of inputted destinations and the distance or destination matrix as a JSON.
 
 The Flask server responds with a JSON that contains the optimal order in which to travel to each destination (determined by TSP algorithm).
@@ -98,11 +116,11 @@ The async/await keywords allow the the function to operate asynchronously. The f
 The algorithm parameter can be either 'MST' or 'genetic'.
 ****************************************************************************************************************************************************************************/
 async function getOptimalRoute(algorithm, matrix, destinations) {
-    // send HTTP POST request to the URL /optimalroute
+    // send HTTP POST request to the URL /api/optimal_route
     // header specifies to the receiving Flask server that we are sending a json
     // body of request is a JSON with the number of destinations on the route and distance matrix
     console.log("Algorithm requested:", algorithm);
-    const flask_response = await fetch('/algo', {
+    const flask_response = await fetch('/api/optimal_route', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 'numDests': destinations.length - 1, 'distMatrix': matrix, 'algorithm': algorithm }),
